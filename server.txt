@@ -1,0 +1,10 @@
+database server: http://104.248.254.71/phpmyadmin
+
+username: bloomrydes
+password: %M#{rav#i)gs
+
+ftp server: http://104.248.254.71
+
+username: root
+password: Brainbox100
+port:22

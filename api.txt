@@ -1,0 +1,339 @@
+API
+
+Test
+Host: http://localhost/bloomrydes/public/api/
+
+Live
+Host: http://104.248.254.71/bloomrydes/public/api/
+
+
+//end points
+
+http://104.248.254.71/bloomrydes/public/api/add-vehicle
+
+
+http://104.248.254.71/bloomrydes/public/api/vehicles
+
+
+http://104.248.254.71/bloomrydes/public/api/set-default-vehicle
+
+
+http://104.248.254.71/bloomrydes/public/api/request-trip
+
+
+http://104.248.254.71/bloomrydes/public/api/accept-request
+
+
+http://104.248.254.71/bloomrydes/public/api/profile
+
+
+http://104.248.254.71/bloomrydes/public/api/socket-send
+
+
+http://104.248.254.71/bloomrydes/public/api/drop-off
+
+
+http://104.248.254.71/bloomrydes/public/api/update-profile
+
+
+- Login
+
+/login
+
+Method: POST
+
+Parameters: 
+
+phone (string)
+
+success response (JSON)
+{
+    "status": true,
+    "phone": "08084049966",
+    "otp": 89015880,
+    "message": "OTP Sent to 08084049966",
+    "has_password": true
+}
+
+Failed response (JSON)
+{
+    "status": false,
+    "phone": "08084049966",
+    "otp": 89015880,
+    "message": "Unable to send to 08084049966 Please try again later",
+    "has_password": false
+}
+
+
+- Authenticate User
+
+/password
+
+Method: POST
+
+Parameters: 
+
+phone (string)
+password (string)
+channel (integer)
+    Accepted options:
+    1 - OTP based authentication
+    2 - Password based authentication
+token (string)
+
+success response (JSON)
+{
+    "id": 2,
+    "name": null,
+    "phone": "08084049966",
+    "email": null,
+    "status": true
+}
+
+Failed response (JSON)
+
+For channel 1
+
+{
+    "status": false,
+    "message": "incorrect login code"
+}
+
+for channel 2
+
+{
+    "status": false,
+    "message": "incorrect login details"
+}
+
+- Register User
+
+/register
+
+Parameters: 
+
+id (integer)    
+name (string)
+email (string)
+password (string)
+
+success response (JSON)
+{
+    "id": 2,
+    "name": "Nelson Idoko",
+    "phone": "08084049966",
+    "email": "idokojunior56@gmail.com",
+    "status": true
+}
+
+Failed response (JSON)
+{
+    "status": false,
+    "message": "Email address is currently being used by another account"
+}
+
+/request-trip
+
+Method: POST
+
+Parameters:
+
+rider_id (integer)
+from (string)
+destination (string)
+private_trip (boolean)
+wait_time (data-time local)
+latlng (string)
+
+success response (JSON)
+
+{
+    "status": true,
+    "data": {
+        "user_id": 1,
+        "name": "Idoko Agbo",
+        "request_details": {
+            "user_id": 1,
+            "from": "Garki, Abuja",
+            "destination": "wuse, Abuja",
+            "private_trip": true,
+            "wait_time": "2019-10-11 18:00:00",
+            "updated_at": "2019-10-30 09:57:02",
+            "created_at": "2019-10-30 09:57:02",
+            "id": 4
+        }
+    }
+}
+
+Failed Response (JSON)
+
+{
+    "status": false,
+    "message": "Multiple trip requests not allowed"
+}
+
+/cancel-request
+
+Method: POST
+
+parameters:
+
+rider_id (Integer)
+request_id (Integer)
+
+success response (JSON)
+
+{
+    "status": true,
+    "message": "Trip request cancelled",
+    "data": {
+        "user_id": 1,
+        "user": "Idoko Agbo",
+        "request_details": {
+            "id": 4,
+            "user_id": 1,
+            "from": "Garki, Abuja",
+            "destination": "wuse, Abuja",
+            "private_trip": 1,
+            "wait_time": "2019-10-11 18:00:00",
+            "status": 0,
+            "created_at": "2019-10-30 09:57:02",
+            "updated_at": "2019-10-30 10:01:06"
+        }
+    }
+}
+
+Failed Response (JSON)
+
+{
+    "status": false,
+    "message": "Unable to find trip request"
+}
+
+
+/update-profile
+
+Method: POST
+
+parameters:
+
+user_id (Integer)
+field (String)
+value (String)
+
+success_response (JSON)
+
+{
+    "status": true,
+    "data": {
+        "id": 1,
+        "name": null,
+        "phone": "2348084049966",
+        "email": "idokojudge@gmail.com"
+    }
+}
+
+/trip-rating
+
+Method: POST
+
+parameters:
+
+user_id (Integer)
+trip_id (Integer)
+rating (Integer)
+review (String)
+
+success_response (JSON)
+
+{
+    "status": true,
+    "message": "Trip rating successful"
+}
+
+
+/trip-history
+
+Method: GET
+
+parameters:
+
+rider_id (Integer)
+
+success_response (JSON)
+
+{
+    "status": true,
+    "message": "3 trips",
+    "data": [
+        {
+            "id": 10,
+            "driver": "Idoko Agbo",
+            "from": "Banex, Aminu Kano Crescent, Abuja, Nigeria",
+            "destination": "Maitama, Abuja, Nigeria",
+            "date": "2019-11-24T00:00:00.000000Z",
+            "vehicle": "toyota camry",
+            "is_completed": null,
+            "trip_status": "completed",
+            "rating": 4
+        },
+        {
+            "id": 9,
+            "driver": "Idoko Agbo",
+            "from": "Banex, Wuse Market Road, Abuja, Nigeria",
+            "destination": "Maitama, Abuja, Nigeria",
+            "date": "2019-11-24T00:00:00.000000Z",
+            "vehicle": "toyota camry",
+            "is_completed": null,
+            "trip_status": "completed",
+            "rating": 5
+        },
+        {
+            "id": 8,
+            "driver": "Idoko Agbo",
+            "from": "Banex, Aminu Kano Crescent, Abuja, Nigeria",
+            "destination": "Maitama, Abuja, Nigeria",
+            "date": "2019-11-24T00:00:00.000000Z",
+            "vehicle": "toyota camry",
+            "is_completed": null,
+            "trip_status": "completed",
+            "rating": null
+        }
+    ]
+}
+
+
+/upload
+
+Method: POST
+
+parameters
+ user_id (integer)
+ file (base64)
+ file_type (string) value=avatar
+ file_name (String) 
+ 
+ success_response (JSON)
+ 
+ {
+ 
+    status": true,
+    "message": "Avatar uploaded",
+    
+ }
+ 
+ http://104.248.254.71/bloomrydes/public/api/get-otp
+ 
+ Method: POST
+ parameters
+ phone (string:e164)
+ 
+ success_response (JSON)
+ 
+ 
+ failed_response
+ 
+ {
+    "status": false,
+    "message": "No valid OTP"
+}
