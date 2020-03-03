@@ -31,12 +31,12 @@ class TripController extends Controller
         
         if($check==null){
             
-            //flip date
-            if($wait_time->format('A')=="AM"){
-                $wait_time=$wait_time->addHours(12);
-            }else{
-                $wait_time=$wait_time->subHours(12);
-            }
+//            //flip date
+//            if($wait_time->format('A')=="AM"){
+//                $wait_time=$wait_time->addHours(12);
+//            }else{
+//                $wait_time=$wait_time->subHours(12);
+//            }
             
             $tripRequest=new TripRequest;
             
@@ -218,9 +218,9 @@ class TripController extends Controller
         $type=$request->type;
         
         if($date->isToday()){
-            $date=Carbon::tomorrow()->subMinutes(1);
+            $date=Carbon::now();
         }        
-        if(Carbon::now()->gt($date)){
+        if(Carbon::now()->subMinutes(1)->gt($date)){
             $response=[
                 'status'=>false,
                 'message'=>'Please provide a valid departure date',
