@@ -8,3 +8,8 @@ ftp server: http://104.248.254.71
 username: root
 password: Brainbox100
 port:22
+
+
+$con=mysqli_init(); 
+mysqli_ssl_set($con, NULL, NULL, {ca-cert filename}, NULL, NULL); 
+mysqli_real_connect($con, "bloomrydes1.mysql.database.azure.com", "bloomrydes@bloomrydes1", {your_password}, {your_database}, 3306);

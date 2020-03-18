@@ -24,6 +24,7 @@ class TripController extends Controller
         $private_trip=(boolean)$request->private_trip;
         $wait_time=Carbon::parse($request->wait_time);
         $latlng=$request->latlng;
+        $price=$request->cost;
         
         $user=User::where('id',$rider_id)->first();
         
@@ -46,7 +47,7 @@ class TripController extends Controller
             $tripRequest->private_trip=$private_trip;
             $tripRequest->wait_time=$wait_time;
             $tripRequest->latlng=$latlng;
-            
+            $tripRequest->price=$price;
             $tripRequest->save();
             
             $response=[
@@ -189,7 +190,7 @@ class TripController extends Controller
                     'driver_phone'=>$driver->phone,
                     'from'=>$trip->from,
                     'destination'=>$trip->to,
-                    'date'=>$trip->date->format('F d, Y h:i:s'),
+                    'date'=>$trip->date->format('F d, Y h:i:s A'),
                     'vehicle'=>$vehicle->make." ".$vehicle->model,
                     'license_plate'=>$vehicle->plate_number,
                     'is_completed'=>$trip->is_complete,
@@ -267,6 +268,7 @@ class TripController extends Controller
                     'from'=>$trip_request->from,
                     'destination'=>$trip_request->destination,
                     'rider_avatar'=>$avatar,
+                    'price'=>$trip_request->price,
                     'wait_time'=>$trip_request->wait_time->format("d M · h:i A"),
                 ];
             }

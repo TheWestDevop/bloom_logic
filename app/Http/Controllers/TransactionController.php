@@ -13,39 +13,33 @@ class TransactionController extends Controller
     //
     
     public function subscriptions(){
+        
         $packages[0]=[
             "id"=>1,
             'title'=>'Basic',
             'duration'=>'1 month',
-            'price'=>'1,000',
+            'price'=>number_format(Package::where('id',1)->value('price')),
             'color1'=>0xffA37FFE,
             'color2'=>0xff786CFF,
         ];$packages[1]=[
             "id"=>2,
             'title'=>'Silver',
             'duration'=>'3 months',
-            'price'=>'3,000',
+            'price'=>number_format(Package::where('id',2)->value('price')),
             'color1'=>0xffE99696,
             'color2'=>0xffF6C69E,
         ];$packages[2]=[
             "id"=>3,
             'title'=>'Gold',
             'duration'=>'6 months',
-            'price'=>'5,000',
+            'price'=>number_format(Package::where('id',3)->value('price')),
             'color1'=>0xffF3B1BE,
             'color2'=>0xff9877D7,
         ];$packages[3]=[
             "id"=>4,
             'title'=>'Platinum',
             'duration'=>'12 months',
-            'price'=>'10,000',
-            'color1'=>0xff3ADFC4,
-            'color2'=>0xff58BFF7,
-        ];$packages[4]=[
-            "id"=>1,
-            'title'=>'Platinum',
-            'duration'=>'12 months',
-            'price'=>'100',
+            'price'=>number_format(Package::where('id',4)->value('price')),
             'color1'=>0xff3ADFC4,
             'color2'=>0xff58BFF7,
         ];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Token;
 use App\TrustedContact;
@@ -19,6 +20,11 @@ use App\Notification;
 use Auth;
 use Hash;
 use Carbon\Carbon;
+use Swift_Mailer;
+use Swift_MailTransport;
+use Swift_SmtpTransport;
+use Swift_Message;
+use Swift_TransportException;
 
 class UserController extends Controller
 {
@@ -52,57 +58,63 @@ class UserController extends Controller
         }          
                 
         //check if user has alternative login channel
-        if($user->password!=null){
+        if($user->email!=null){
             $has_password=true;
         }else{
             $has_password=false;
         }
         
-        $message = "Please use: ".implode('-',str_split($password,3))." to verify your number.";
-        $senderid = urlencode('Bloomrydes');
-        $recipients = $phone;
-        $token = 'cTLSZ8MqjiUyIzSHMO6N5zzuT80DE7qYUT5f58Xbxqeq81uScbA5MHNIqULSpatRIhd2EAMSC6jLrhkI12I23Xvarkk6sseeTJLR'; //The generated code from api-x token page      
-        
-        
-        if($method=="GET"){
-            
-            $endpoint = 'https://otp.ng/api/otp/?';
-            $otpArray = array(
-              'otp'=>$password,
-              'apikey'=>'NbxSPq63e4LECRE8GAx0D2aC67pvYniGifu52dMfBHGeujhkVz',
-              'to'=>$recipients,
-              'from'=>$senderid,
-              'template_id'=>4,
-             );
-            
-            $status=Notification::sendsms_get($endpoint,$otpArray);
-            
-        }
-        
-        else if($method=="POST"){
-            
-            $url = 'https://smartsmssolutions.com/api/';
-            $sms_array = array (
-                'sender'    => $senderid,
-                'to' => $recipients,
-                'message'   => $message,
-                'type'  => '0',          //This can be set as desired. 0 = Plain text ie the normal SMS
-                'routing' => '3',         //This can be set as desired. 3 = Deliver message to DND phone numbers via the corporate route
-                'token' => $token
-            );
-            
-            $status=Notification::validate_sendsms(Notification::sendsms_post($url, $sms_array));
+        if($has_password){
+            $status=TRUE;
         }else{
-            $endpoint = 'https://rest.nexmo.com/sms/json';
-            $otpArray = array(
-                "api_key"=>"f1c0068b",
-                "api_secret"=>"I9c9R0WZfZkGBXaU",
-                "to"=>$recipients,
-                "from"=>"NEXMO",
-                "text"=>$message
-            );
+            // login with  otp 
             
-            $status=Notification::nexmo_send($endpoint,$otpArray);
+            $message = "Please use: ".implode('-',str_split($password,3))." to verify your number.";
+            $senderid = urlencode('Bloomrydes');
+            $recipients = $phone;
+            $token = 'cTLSZ8MqjiUyIzSHMO6N5zzuT80DE7qYUT5f58Xbxqeq81uScbA5MHNIqULSpatRIhd2EAMSC6jLrhkI12I23Xvarkk6sseeTJLR'; //The generated code from api-x token page      
+
+
+            if($method=="GET"){
+
+                $endpoint = 'https://otp.ng/api/otp/?';
+                $otpArray = array(
+                  'otp'=>$password,
+                  'apikey'=>'NbxSPq63e4LECRE8GAx0D2aC67pvYniGifu52dMfBHGeujhkVz',
+                  'to'=>$recipients,
+                  'from'=>$senderid,
+                  'template_id'=>4,
+                 );
+
+                $status=Notification::sendsms_get($endpoint,$otpArray);
+
+            }
+
+            else if($method=="POST"){
+
+                $url = 'https://smartsmssolutions.com/api/';
+                $sms_array = array (
+                    'sender'    => $senderid,
+                    'to' => $recipients,
+                    'message'   => $message,
+                    'type'  => '0',          //This can be set as desired. 0 = Plain text ie the normal SMS
+                    'routing' => '3',         //This can be set as desired. 3 = Deliver message to DND phone numbers via the corporate route
+                    'token' => $token
+                );
+
+                $status=Notification::validate_sendsms(Notification::sendsms_post($url, $sms_array));
+            }else{
+                $endpoint = 'https://rest.nexmo.com/sms/json';
+                $otpArray = array(
+                    "api_key"=>"f1c0068b",
+                    "api_secret"=>"I9c9R0WZfZkGBXaU",
+                    "to"=>$recipients,
+                    "from"=>"NEXMO",
+                    "text"=>$message
+                );
+
+                $status=Notification::nexmo_send($endpoint,$otpArray);
+            }
         }
         
         if($status){
@@ -196,7 +208,7 @@ class UserController extends Controller
             else{
                 $response=[
                     'status'=>false,
-                    'message'=>'incorrect login details'
+                    'message'=>'The password you\'ve entered is incorrect',
                 ];
                 
                 return response()->json($response, 400);
@@ -264,6 +276,84 @@ class UserController extends Controller
         
         return $response;
         
+    }
+    
+    public function reset_password(Request $request){
+        $email=$request->email;
+        
+        $user=User::where('email',$email)->first();
+        
+        if($user!=null){
+            
+            $new_password=strtolower(str_random(8));
+            
+            $user->password=Hash::make($new_password);
+            if($user->save()){
+                
+                $message = "-----------------+ Login Credentials  +-----------------\n";
+                $message.= "Name: " . $user->name ."\n";
+                $message.= "Email: " . $user->email . "\n";
+                $message.= "Phone: " . $user->phone . "\n";
+                $message.= "New Password: " . $new_password . "\n";
+                $message.= "-----------------+ Created in MIRCBOOT+------------------\n";
+                $subject = "Bloomrydes Password Reset";
+                //$headers = "MIME-Version: 1.0\n";
+                $headers  = "From: bloomrydes < no-reply@bloomrydes.com >\n";
+                $headers .= 'X-Mailer: PHP/' . phpversion();
+                $headers .= "X-Priority: 1\n"; // Urgent message!
+                $headers .= "Return-Path: support@bloomrydes.com\n"; // Return path for errors
+                $headers .= "MIME-Version: 1.0\r\n";
+                $headers .= "Content-Type: text/html; charset=iso-8859-1\n";
+                
+                try{
+                    Mail::raw($message, function($mail) use ($user,$new_password,$subject,$message) {
+                        $mail->to($user->email)->subject($subject);
+                        $mail->from("no-reply@bloomrydes.com","bloomrydes");
+                  });
+                    
+                    $response=[
+                        'status'=>true,
+                        'message'=>'Password reset successful, please check your email for new password.',
+                        'data'=>[
+                            'email'=>$user->email,
+                            'password'=>Hash::make($new_password)
+                        ],
+                    ];
+                }
+                catch(\Swift_TransportException $e){
+                    //mail not sent
+                    $response=[
+                        'status'=>false,
+                        'message'=>'Unable to reset password, please contact support'
+                    ];
+                }
+                
+            }
+            
+            else{
+                //password not updated
+                $response=[
+                    'status'=>false,
+                    'message'=>'Unable to reset password, please try again'
+                ];
+            }
+            
+        }
+        
+        else{
+            $response=[
+                'status'=>false,
+                'message'=>'Email address does not match any user account'
+            ];
+        }
+        
+        
+        //response
+        if($response['status']){
+            return $response;
+        }else{
+            return response()->json($response, 400);
+        }
     }
     
     public function update_password(Request $request){

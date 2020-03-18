@@ -57,7 +57,7 @@ class DriverController extends Controller
                     //no default vehicle
                     $response=[
                         'status'=>false,
-                        'message'=>"Default vehicle not set"
+                        'message'=>"Default vehicle not set. Go to vehicles under your profile, swipe left to set default vehicle"
                     ];
 
                     return response()->json($response, 400);
@@ -140,7 +140,7 @@ class DriverController extends Controller
                                     "driver_rating": "'.User::avg_rating($vehicle->driver_id).'",
                                     "from": "'.$trip_request->from.'",
                                     "destination": "'.$trip_request->destination.'",
-                                    "date": "'.$trip_request->wait_time->format('F d, Y h:i:s').'",
+                                    "date": "'.$trip_request->wait_time->format('F d, Y h:i:s A').'",
                                     "created_on": "'.$trip_request->created_at.'"
                                 }
                             }
@@ -343,7 +343,7 @@ class DriverController extends Controller
                                 "driver": "'.User::where("id",$driver_id)->value("name").'",
                                 "from": "'.$trip->from.'",
                                 "to": "'.$trip->to.'",
-                                "trip_date": "'.$trip->date->format('F d, Y h:i:s').'",
+                                "trip_date": "'.$trip->date->format('F d, Y h:i:s A').'",
                                 "rate_driver": "false"
                             }
                         }
@@ -434,7 +434,7 @@ class DriverController extends Controller
                                 "driver": "'.User::where("id",$driver_id)->value("name").'",
                                 "from": "'.$trip->from.'",
                                 "to": "'.$trip->to.'",
-                                "trip_date": "'.$trip->date->format('F d, Y h:i:s').'",
+                                "trip_date": "'.$trip->date->format('F d, Y h:i:s A').'",
                                 "rate_driver": "true"
                             }
                         }

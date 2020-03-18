@@ -42,6 +42,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     
+    public function getNameAttribute($value){
+        return ucwords($value);
+    }
+    
     public static function notification_receiver($user_id){
         $device_token=PushId::where('user_id',$user_id)->where('status',1)->orderBy('id','DESC')->first();
         
@@ -112,7 +116,8 @@ class User extends Authenticatable
                         'destination'=>$trip_request->destination,
                         'wait_time'=>$trip_request->wait_time->format("d M · h:i A"),
                         'rider_photo'=>$rider_photo,
-                        'rating'=>User::avg_rating($booking->rider_id)
+                        'rating'=>User::avg_rating($booking->rider_id),
+                        'price'=>$trip_request->price,
                     ];
                 }
                 
@@ -195,7 +200,8 @@ class User extends Authenticatable
                     "driver_photo"=>$driver_photo,
                     "from"=>$trip_details->from,
                     "destination"=>$trip_details->to,
-                    "date"=>$trip_details->date->format('F d, Y h:i:s'),
+                    "price"=>TripRequest::where('user_id',$user->id)->orderBy('id','DESC')->value('price'),
+                    "date"=>$trip_details->date->format('F d, Y h:i:s A'),
                     "created_on"=>$trip_details->created_at,
                 ];
             }else{
@@ -212,8 +218,9 @@ class User extends Authenticatable
                         "driver_phone"=>null,
                         "driver_photo"=>null,
                         "from"=>$trip->from,
+                        'price'=>$trip->price,
                         "destination"=>$trip->destination,
-                        "date"=>$trip->wait_time->format('F d, Y h:i:s'),
+                        "date"=>$trip->wait_time->format('F d, Y h:i:s A'),
                         "created_on"=>$trip->created_at,
                     ];
                 }

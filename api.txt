@@ -337,3 +337,53 @@ parameters
     "status": false,
     "message": "No valid OTP"
 }
+
+/reset-password
+
+Method: POST
+
+parameters
+    email (String)
+    
+success_response (JSON)
+    
+    {
+        "status": true,
+        "message": "Password reset successful",
+        "data": {
+            "email": "idoko@jobtaska.com",
+            "password": "llfngumo"
+        }
+    }
+    
+failed_response
+    
+    {
+        "status": false,
+        "message": "Email address does not match any user account",
+        
+    }
+    
+    
+/change-password
+
+Method: POST
+parameters
+    user_id (integer)
+    current_password (String)
+    new_password (String)
+    confirm_password (String)
+    
+success_response
+    {
+        "status": true,
+        "message": "password updated",
+        
+    }
+    
+failed_response
+    {
+        "status": false,
+        "message": "Incorrect password",
+        
+    }
