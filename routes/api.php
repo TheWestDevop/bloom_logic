@@ -72,7 +72,7 @@ Route::any('vehicles','VehicleController@list_vehicles');
 Route::post('set-default-vehicle','VehicleController@set_default');
 
 //transaction & subscription apis
-Route::any('cancel-subscription','UserController@cancel-subscriptions');
+Route::any('cancel-subscription','UserController@cancel_subscriptions');
 //get subscription packages
 Route::get('packages','TransactionController@subscriptions');
 
