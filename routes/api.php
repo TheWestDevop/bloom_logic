@@ -25,7 +25,7 @@ Route::post('reset-password','UserController@reset_password');
 //user logout
 Route::post('logout','UserController@logout');
 
-//upload id card, photo, inspection reports & any docuemnt 
+//upload id card, photo, inspection reports & any docuemnt
 Route::post('upload','UserController@upload');
 
 //update profile and settings
@@ -72,7 +72,7 @@ Route::any('vehicles','VehicleController@list_vehicles');
 Route::post('set-default-vehicle','VehicleController@set_default');
 
 //transaction & subscription apis
-
+Route::any('cancel-subscription','UserController@cancel-subscriptions');
 //get subscription packages
 Route::get('packages','TransactionController@subscriptions');
 
@@ -85,12 +85,12 @@ Route::any('find-requests','TripController@find_requests');
 Route::any('get-otp','UserController@getOtp');
 
 Route::any('test-otp',function(){
-    
-    
+
+
     $password=rand(100000,999999);
-    
+
     return implode('-',str_split($password,3));
-    
+
     $endpoint = 'https://rest.nexmo.com/sms/json';
     $otpArray = array(
         "api_key"=>"f1c0068b",
@@ -100,26 +100,26 @@ Route::any('test-otp',function(){
         "text"=>"Use 087-654 to verify your number"
     );
     $params = http_build_query($otpArray);
-    $ch = curl_init(); 
-    curl_setopt($ch, CURLOPT_URL,$endpoint); 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,true); 
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL,$endpoint);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POST, 1); 
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $params); 
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 //    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer '.$jwt,'Content-Type: application/json','Accept: application/json'));
-    $response = curl_exec($ch); 
-    curl_close($ch); 
-    
+    $response = curl_exec($ch);
+    curl_close($ch);
+
     $response=json_decode($response);
-    
+
     if($response->messages[0]->status==0){
         return TRUE;
     }else{
         return FALSE;
     }
-    
+
 //    return uniqid();
-//    
+//
 //    $password=implode('-',str_split(rand(100000,999999),2));
 //    return $password;
 });
