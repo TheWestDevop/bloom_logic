@@ -514,8 +514,8 @@ class UserController extends Controller
 
         return $response;
     }
-    
-    public function cancel_subscription(Request $request){
+
+    public function cancel_subscriptions(Request $request){
         $user_id=$request->user_id;
         $user_sub = Subscription::where('user_id',$user_id)->update(['is_active'=>0]);
         if ($user_sub != null) {
