@@ -529,7 +529,7 @@ class UserController extends Controller
                 'message'=>'Subscription Cancelled was not Successfully'
             ];
         }
-
+        return $response;
 
     }
     //get user profile and active trips
