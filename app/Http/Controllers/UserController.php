@@ -514,24 +514,8 @@ class UserController extends Controller
 
         return $response;
     }
-    
-    public function cancel_subscription(Request $request){
-        $user_id=$request->user_id;
-        $user_sub = Subscription::where('user_id',$user_id)->update(['is_active'=>0]);
-        if ($user_sub != null) {
-            $response=[
-                'status'=>true,
-                'message'=>'Subscription Cancelled Successfully'
-            ];
-        } else {
-            $response=[
-                'status'=>false,
-                'message'=>'Subscription Cancelled was not Successfully'
-            ];
-        }
 
-
-    }
+   
     //get user profile and active trips
     public function profile(Request $request){
         $user_id=$request->user_id;
