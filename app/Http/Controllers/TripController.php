@@ -21,10 +21,17 @@ class TripController extends Controller
         $rider_id=$request->rider_id;
         $from=$request->from;
         $destination=$request->destination;
-        $private_trip=$request->private_trip;
+
         $wait_time=Carbon::parse($request->wait_time);
         $latlng=$request->latlng;
         $price=$request->cost;
+
+        if ($request->private_trip == null) {
+            $private_trip=1;
+        } else {
+            $private_trip=0;
+        }
+
 
         $user=User::where('id',$rider_id)->first();
 
