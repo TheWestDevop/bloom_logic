@@ -232,7 +232,7 @@ class TripController extends Controller
         if(User::can_drive($driver_id)==false){
             $response=[
                 'status'=>false,
-                'message'=>'If you have uploaded all your document. \n Please allow up to 6 hours for Verification \n Process to be completed'
+                'message'=>'If you have uploaded all your document.Please allow up to 6 hours for Verification Process to be completed'
             ];
             return response()->json($response, 400);
         }
