@@ -238,7 +238,7 @@ class TripController extends Controller
         }
 
 
-        $trip_requests=TripRequest::where('user_id','!=',$driver_id)->where('from','LIKE',"%$from%")->where('destination','LIKE',"%$destination%")->where('wait_time','>=',$date)->where('status',1)->where('private','==',$type)->get();
+        $trip_requests=TripRequest::where('user_id','!=',$driver_id)->where('from','LIKE',"%$from%")->where('destination','LIKE',"%$destination%")->where('wait_time','>=',$date)->where('status',1)->where('private',$type)->get();
 
         if($trip_requests->isEmpty()){
             $response=[
