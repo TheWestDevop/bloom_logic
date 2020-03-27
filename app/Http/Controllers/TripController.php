@@ -16,7 +16,7 @@ use Carbon\Carbon;
 class TripController extends Controller
 {
     //
-    
+
     public function create_request(Request $request){
         $rider_id=$request->rider_id;
         $from=$request->from;
@@ -25,22 +25,22 @@ class TripController extends Controller
         $wait_time=Carbon::parse($request->wait_time);
         $latlng=$request->latlng;
         $price=$request->cost;
-        
+
         $user=User::where('id',$rider_id)->first();
-        
+
         $check=TripRequest::where('user_id',$user->id)->where('status','>=',1)->first();
-        
+
         if($check==null){
-            
+
 //            //flip date
 //            if($wait_time->format('A')=="AM"){
 //                $wait_time=$wait_time->addHours(12);
 //            }else{
 //                $wait_time=$wait_time->subHours(12);
 //            }
-            
+
             $tripRequest=new TripRequest;
-            
+
             $tripRequest->user_id=$user->id;
             $tripRequest->from=$from;
             $tripRequest->destination=$destination;
@@ -49,7 +49,7 @@ class TripController extends Controller
             $tripRequest->latlng=$latlng;
             $tripRequest->price=$price;
             $tripRequest->save();
-            
+
             $response=[
                 'status'=>true,
                 'data'=>[
@@ -63,25 +63,25 @@ class TripController extends Controller
                 'status'=>false,
                 'message'=>'Multiple trip requests not allowed'
             ];
-            
+
             return response()->json($response, 400);
         }
-        
+
         return $response;
     }
-    
+
     public function cancel_request(Request $request){
         $rider_id=$request->rider_id;
         $request_id=$request->request_id;
-        
+
         $user=User::where('id',$rider_id)->first();
-        
+
         $tripRequest=TripRequest::where('id',$request_id)->where('user_id',$user->id)->first();
-        
+
         if($tripRequest!=null){
-            
+
             if($tripRequest->status==0){
-                
+
                 //check booking
                 $check_booking=Booking::where('rider_id',$rider_id)->where('status',1)->first();
 
@@ -100,7 +100,7 @@ class TripController extends Controller
                 $tripRequest->status=0;
                 $tripRequest->save();
             }
-            
+
             $response=[
                 'status'=>true,
                 'message'=>'Trip request cancelled',
@@ -110,30 +110,30 @@ class TripController extends Controller
                     'request_details'=>$tripRequest,
                 ],
             ];
-            
+
         }else{
             $response=[
                 'status'=>false,
                 'message'=>'Unable to find trip request',
             ];
-            
+
             return response()->json($response, 400);
         }
-        
+
         return $response;
-        
+
     }
-    
+
     public function history(Request $request){
         $user_id=$request->rider_id;
         $app=$request->app;
-        
+
         if($app=='driver'){
-            
+
             $trips=Trip::where('driver_id',$user_id)->orderBy('id','DESC')->get();
-            
+
             $trip_list=array();
-            
+
             foreach($trips as $trip){
                 if($trip->status==1){
                     $status='pending';
@@ -144,9 +144,9 @@ class TripController extends Controller
                 }else{
                     $status='cancelled';
                 }
-                
+
                 $vehicle=Vehicle::where('id',$trip->vehicle_id)->first();
-                
+
                 $trip_list[]=[
                     'id'=>$trip->id,
                     'from'=>$trip->from,
@@ -159,9 +159,9 @@ class TripController extends Controller
                     'riders'=>[],
                     'rate_rider'=>false,
                 ];
-                
+
             }
-            
+
         }else{
             $trip_id=Booking::where('rider_id',$user_id)->orderBy('id','DESC')->pluck('trip_id')->toArray();
 
@@ -199,28 +199,28 @@ class TripController extends Controller
                 ];
             }
         }
-        
-            
-        
+
+
+
         $response=[
             'status'=>true,
             'message'=>count($trips).' trips',
             'data'=>$trip_list,
         ];
-        
+
         return $response;
     }
-    
+
     public function find_requests(Request $request){
         $driver_id=$request->driver_id;
         $from=$request->from;
         $destination=$request->destination;
         $date=Carbon::parse($request->date);
         $type=$request->type;
-        
+
         if($date->isToday()){
             $date=Carbon::now();
-        }        
+        }
         if(Carbon::now()->subMinutes(1)->gt($date)){
             $response=[
                 'status'=>false,
@@ -228,34 +228,34 @@ class TripController extends Controller
             ];
             return response()->json($response, 400);
         }
-        
+
         if(User::can_drive($driver_id)==false){
             $response=[
                 'status'=>false,
-                'message'=>'Please complete your registration then, try again'
+                'message'=>'If you have uploaded all your document. \n Please allow up to 6 hours for Verification \n Process to be completed'
             ];
             return response()->json($response, 400);
         }
-        
-        
+
+
         $trip_requests=TripRequest::where('user_id','!=',$driver_id)->where('from','LIKE',"%$from%")->where('destination','LIKE',"%$destination%")->where('wait_time','>=',$date)->where('status',1)->get();
-        
+
         if($trip_requests->isEmpty()){
             $response=[
                 'status'=>false,
                 'message'=>"No trip requests",
                 'data'=>$trip_requests,
             ];
-            
+
             return response()->json($response, 400);
         }
         else{
             $data=[];
-            
+
             foreach($trip_requests as $trip_request){
-                
+
                 $avatar=UserDocument::where('user_id',$trip_request->user_id)->where('document_name','avatar')->value('file_loc');
-            
+
                 if($avatar!=null){
                     $avatar=\Config::get('values.app_api').'/uploads/avatar/'.$avatar;
                 }
@@ -272,7 +272,7 @@ class TripController extends Controller
                     'wait_time'=>$trip_request->wait_time->format("d M · h:i A"),
                 ];
             }
-            
+
             $response=[
                 'status'=>true,
                 'data'=>$data,
@@ -281,21 +281,21 @@ class TripController extends Controller
 
         return $response;
     }
-    
+
     //rating and review
-    
+
     public function rating(Request $request){
         $user_id=$request->user_id;
         $trip_id=$request->trip_id;
         $object_id=$request->object_id;
-        
+
         $rating=$request->rating;
         $review=$request->review;
-        
+
         if($object_id==null){
             //passenger doing the rating
             $object_id=Trip::where('id',$trip_id)->value('driver_id');
-            
+
             $role='rider';
             //trip is not valid
             if($object_id==null){
@@ -309,36 +309,36 @@ class TripController extends Controller
         }else{
             $role='driver';
         }
-        
+
         $trip_rating=TripRating::where('user_id',$user_id)->where('trip_id',$trip_id)->where('object_id',$object_id)->first();
-        
+
         if($trip_rating==null){
             $trip_rating=new TripRating;
         }
-        
+
         $trip_rating->user_id=$user_id;
         $trip_rating->trip_id=$trip_id;
         $trip_rating->object_id=$object_id;
-        
+
         $trip_rating->rating=$rating;
         $trip_rating->review=$review;
         $trip_rating->user_role=$role;
-        
+
         if($trip_rating->save()){
             $response=[
                 'status'=>true,
                 'message'=>'Trip rating successful',
             ];
-            
+
         }else{
             $response=[
                 'status'=>false,
                 'message'=>'Unable to complete rating',
             ];
-            
+
             return response()->json($response, 400);
         }
-        
+
         return $response;
     }
 }
