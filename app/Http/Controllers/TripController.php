@@ -21,7 +21,7 @@ class TripController extends Controller
         $rider_id=$request->rider_id;
         $from=$request->from;
         $destination=$request->destination;
-        $private_trip=$request->private_trip;
+        $private_trip=(boolean)$request->private_trip;
         $wait_time=Carbon::parse($request->wait_time);
         $latlng=$request->latlng;
         $price=$request->cost;
