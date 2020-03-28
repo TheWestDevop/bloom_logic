@@ -156,7 +156,7 @@ class UserController extends Controller
                     'message'=>'No valid OTP'
                 ];
 
-                return response()->json($response, 400);
+                return response()->json($response, 200);
         }
 
         $user=User::where('phone',$phone)->first();
