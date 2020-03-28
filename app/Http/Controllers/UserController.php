@@ -53,7 +53,7 @@ class UserController extends Controller
 
             $token=new Token;
             $token->phone=$phone;
-            $token->token=435679;
+            $token->token=$password;
             $token->save();
         }
 
